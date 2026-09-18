@@ -1,0 +1,10 @@
+{
+  "name": "post-hospitalization-recovery-platform",
+  "version": "1.0.0",
+  "description": "Post-Hospitalization Monitoring and Risk Prediction Platform",
+  "scripts": {
+    "server": "cd server && npm start",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build"
+  }
+}

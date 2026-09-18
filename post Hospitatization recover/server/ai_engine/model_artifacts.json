@@ -1,0 +1,47 @@
+{
+  "model_type": "Scikit-Learn Random Forest Classifier (100 Estimators)",
+  "accuracy": 0.73,
+  "n_samples": 1500,
+  "feature_names": [
+    "Age",
+    "High Acuity Case",
+    "Heart Rate",
+    "SpO2 Saturation",
+    "Systolic BP",
+    "Temperature",
+    "Respiratory Rate",
+    "Pain Level",
+    "Fatigue Level",
+    "Chest Discomfort",
+    "Shortness of Breath",
+    "Peripheral Swelling",
+    "Dizziness",
+    "Medication Adherence %",
+    "SpO2 48h Drop",
+    "Heart Rate Spike"
+  ],
+  "feature_importances": {
+    "Medication Adherence %": 0.1427,
+    "SpO2 Saturation": 0.1141,
+    "Chest Discomfort": 0.0999,
+    "Shortness of Breath": 0.0925,
+    "SpO2 48h Drop": 0.0901,
+    "Systolic BP": 0.0678,
+    "Heart Rate": 0.0618,
+    "Pain Level": 0.056,
+    "Age": 0.052,
+    "Heart Rate Spike": 0.048,
+    "Temperature": 0.0461,
+    "Respiratory Rate": 0.0337,
+    "Peripheral Swelling": 0.0326,
+    "Fatigue Level": 0.0288,
+    "High Acuity Case": 0.0192,
+    "Dizziness": 0.0146
+  },
+  "classes": [
+    "Low Risk",
+    "Moderate Risk",
+    "High Risk"
+  ],
+  "status": "ready"
+}
