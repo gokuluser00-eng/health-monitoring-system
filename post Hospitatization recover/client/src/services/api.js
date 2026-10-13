@@ -1,5 +1,5 @@
-const PRIMARY_API = "/api";
-const FALLBACK_API = "http://localhost:5000/api";
+const PRIMARY_API = import.meta.env.VITE_API_BASE_URL || "/api";
+const FALLBACK_API = "http://127.0.0.1:5000/api";
 
 const request = async (endpoint, options = {}) => {
   const token = localStorage.getItem("pmr_token");
@@ -14,8 +14,12 @@ const request = async (endpoint, options = {}) => {
     headers,
   };
 
+  const resolveUrl = (baseUrl) =>
+    endpoint.startsWith("http") ? endpoint : `${baseUrl}${endpoint}`;
+
   try {
-    const res = await fetch(`${PRIMARY_API}${endpoint}`, config);
+    const requestUrl = resolveUrl(PRIMARY_API);
+    const res = await fetch(requestUrl, config);
     if (!res.ok) {
       if (res.status === 404 || res.status === 502 || res.status === 504) {
         throw new Error(`Proxy error ${res.status}`);
@@ -26,7 +30,8 @@ const request = async (endpoint, options = {}) => {
     return await res.json().catch(() => ({}));
   } catch (proxyError) {
     try {
-      const fallbackRes = await fetch(`${FALLBACK_API}${endpoint}`, config);
+      const fallbackUrl = resolveUrl(FALLBACK_API);
+      const fallbackRes = await fetch(fallbackUrl, config);
       const fallbackData = await fallbackRes.json().catch(() => ({}));
       if (!fallbackRes.ok) {
         throw new Error(

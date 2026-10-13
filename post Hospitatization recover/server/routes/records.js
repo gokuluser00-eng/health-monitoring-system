@@ -1,8 +1,22 @@
 import express from "express";
-import { appendClinicalRecord } from "../services/excelStorage.js";
+import {
+  appendClinicalRecord,
+  WORKBOOK_FILE,
+  readExcelSheetRows,
+} from "../services/excelStorage.js";
 import { requirePatientAccess } from "../middleware/auth.js";
 
 const router = express.Router();
+
+router.get("/live-sheet", (req, res) => {
+  const liveSheet = readExcelSheetRows(WORKBOOK_FILE, "Clinical Records");
+  res.json({
+    sheetName: liveSheet.sheetName,
+    headers: liveSheet.headers,
+    rows: liveSheet.rows,
+    filePath: liveSheet.filePath,
+  });
+});
 
 router.post(
   "/",

@@ -79,20 +79,20 @@ test("savePatientToExcel rejects invalid workbook destinations", async () => {
     riskScore: 21,
   };
 
-  const invalidPath = path.resolve("./data/readonly-marker.txt/invalid_registry.xlsx");
-  fs.mkdirSync(path.dirname(invalidPath), { recursive: true });
-  fs.writeFileSync(path.dirname(invalidPath), "not a directory");
+  const invalidDirectory = path.resolve("./data/readonly-marker.txt");
+  const invalidPath = path.join(invalidDirectory, "invalid_registry.xlsx");
 
   try {
-    await assert.rejects(
+    fs.rmSync(invalidDirectory, { recursive: true, force: true });
+    fs.writeFileSync(invalidDirectory, "not a directory");
+
+    assert.throws(
       () => savePatientToExcel(patient, { workbookPath: invalidPath }),
-      /Excel report could not be saved|
-      patient row not found in Excel workbook after save|
-      EEXIST|ENOTDIR|EISDIR/
+      /Excel report could not be saved/
     );
   } finally {
     try {
-      fs.unlinkSync(path.dirname(invalidPath));
+      fs.unlinkSync(invalidDirectory);
     } catch {
       // no-op: cleanup is best effort
     }

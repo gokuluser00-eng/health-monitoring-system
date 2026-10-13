@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const WORKBOOK_FILE = path.resolve(__dirname, "../data/clinical_records.xlsx");
+export const WORKBOOK_FILE = path.resolve(__dirname, "../data/clinical_records.xlsx");
 const PATIENT_REGISTRY_FILE = path.resolve(
   __dirname,
   "../data/patient_registry.xlsx"
@@ -90,6 +90,27 @@ const mapPatientToRegistryRow = (patient) =>
   });
 
 const resolveWorkbookPath = (targetPath) => path.resolve(targetPath || PATIENT_REGISTRY_FILE);
+
+export const readExcelSheetRows = (filePath, sheetName) => {
+  const resolvedPath = path.resolve(filePath);
+  if (!fs.existsSync(resolvedPath)) {
+    return { filePath: resolvedPath, sheetName, headers: [], rows: [] };
+  }
+
+  const workbook = XLSX.readFile(resolvedPath);
+  const targetSheetName = workbook.SheetNames.includes(sheetName)
+    ? sheetName
+    : workbook.SheetNames[0] || sheetName;
+  const sheet = workbook.Sheets[targetSheetName];
+  const rows = sheet ? XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" }) : [];
+
+  return {
+    filePath: resolvedPath,
+    sheetName: targetSheetName,
+    headers: Array.isArray(rows[0]) ? rows[0].map((header) => normalizeCellValue(header)) : [],
+    rows: Array.isArray(rows) ? rows.slice(1) : [],
+  };
+};
 
 export const savePatientToExcel = (patient, options = {}) => {
   const filePath = resolveWorkbookPath(options.workbookPath || PATIENT_REGISTRY_FILE);
@@ -200,10 +221,11 @@ export const appendClinicalRecord = (record) => {
   let rows = [];
   if (fs.existsSync(WORKBOOK_FILE)) {
     workbook = XLSX.readFile(WORKBOOK_FILE);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    rows = sheet
-      ? XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" })
-      : [];
+    const targetSheetName = workbook.SheetNames.includes("Clinical Records")
+      ? "Clinical Records"
+      : workbook.SheetNames[0] || "Clinical Records";
+    const sheet = workbook.Sheets[targetSheetName];
+    rows = sheet ? XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" }) : [];
   } else {
     workbook = XLSX.utils.book_new();
   }
@@ -220,7 +242,9 @@ export const appendClinicalRecord = (record) => {
   const nextRow = headers.map((header) => record[header] ?? "");
   const sheet = XLSX.utils.aoa_to_sheet([headers, ...dataRows, nextRow]);
 
-  if (workbook.SheetNames.length > 0) {
+  if (workbook.SheetNames.includes("Clinical Records")) {
+    workbook.Sheets["Clinical Records"] = sheet;
+  } else if (workbook.SheetNames.length > 0) {
     workbook.Sheets[workbook.SheetNames[0]] = sheet;
   } else {
     XLSX.utils.book_append_sheet(workbook, sheet, "Clinical Records");
