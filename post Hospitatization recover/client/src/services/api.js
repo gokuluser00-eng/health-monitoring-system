@@ -45,7 +45,7 @@ const request = async (endpoint, options = {}) => {
         proxyError,
         fallbackError
       );
-      throw proxyError;
+      throw fallbackError;
     }
   }
 };

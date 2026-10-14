@@ -281,7 +281,7 @@ router.post("/register", async (req, res) => {
     followUpDate,
   } = req.body;
 
-  const normalizedEmail = String(email || "").trim();
+  const normalizedEmail = String(email || "").trim().toLowerCase();
   const normalizedName = String(fullName || "").trim();
 
   if (!normalizedName || !normalizedEmail || !String(password || "").trim())
@@ -310,7 +310,7 @@ router.post("/register", async (req, res) => {
     age: Number(age) || 45,
     gender: gender || "Other",
     phone: phone || "",
-    email,
+    email: normalizedEmail,
     password,
     address: address || "",
     emergencyContactName: emergencyContactName || "Not Specified",
